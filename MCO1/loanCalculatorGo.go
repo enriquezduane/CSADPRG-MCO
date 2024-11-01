@@ -1,8 +1,8 @@
-********************
-Last names: C
-Language: Go
-Paradigm(s): Procedural
-********************
+/*
+*Last names: C
+*Language: Go
+*Paradigm(s): Procedural
+*/
 
 
 package main
