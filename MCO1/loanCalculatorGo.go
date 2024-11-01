@@ -1,3 +1,10 @@
+********************
+Last names: C
+Language: Go
+Paradigm(s): Procedural
+********************
+
+
 package main
 
 import (
