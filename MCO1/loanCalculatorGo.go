@@ -17,7 +17,7 @@ func main() {
     loanAmountStr = strings.ReplaceAll(loanAmountStr, ",", "")
     loanAmountStr = strings.TrimSpace(loanAmountStr)
     loanAmount, err := strconv.ParseFloat(loanAmountStr, 64)
-    if err != nil {
+    if err != nil || loadAmount<0{
         fmt.Println("Invalid input for Loan Amount.")
         return
     }
@@ -27,7 +27,7 @@ func main() {
     interestRateStr = strings.TrimSpace(interestRateStr)
     interestRateStr = strings.TrimSuffix(interestRateStr, "%")
     annualInterestRate, err := strconv.ParseFloat(interestRateStr, 64)
-    if err != nil {
+    if err != nil || annualInterestRate < 0{
         fmt.Println("Invalid input for Annual Interest Rate.")
         return
     }
@@ -37,7 +37,7 @@ func main() {
     loanTermStr = strings.ReplaceAll(loanTermStr, "years", "")
     loanTermStr = strings.TrimSpace(loanTermStr)
     loanTermYears, err := strconv.Atoi(loanTermStr)
-    if err != nil {
+    if err != nil || longTermYears < 0{
         fmt.Println("Invalid input for Loan Term.")
         return
     }
