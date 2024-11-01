@@ -11,7 +11,7 @@ import (
 func main() {
     reader := bufio.NewReader(os.Stdin)
 
-    fmt.Print("Enter Loan Amount (PHP): ")
+    fmt.Print("Enter Loan Amount: ")
     loanAmountStr, _ := reader.ReadString('\n')
     loanAmountStr = strings.ReplaceAll(loanAmountStr, "PHP", "")
     loanAmountStr = strings.ReplaceAll(loanAmountStr, ",", "")
@@ -22,7 +22,7 @@ func main() {
         return
     }
 
-    fmt.Print("Enter Annual Interest Rate (%): ")
+    fmt.Print("Enter Annual Interest Rate: ")
     interestRateStr, _ := reader.ReadString('\n')
     interestRateStr = strings.TrimSpace(interestRateStr)
     interestRateStr = strings.TrimSuffix(interestRateStr, "%")
@@ -32,7 +32,7 @@ func main() {
         return
     }
 
-    fmt.Print("Enter Loan Term (years): ")
+    fmt.Print("Enter Loan Term: ")
     loanTermStr, _ := reader.ReadString('\n')
     loanTermStr = strings.ReplaceAll(loanTermStr, "years", "")
     loanTermStr = strings.TrimSpace(loanTermStr)
