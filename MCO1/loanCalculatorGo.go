@@ -1,5 +1,5 @@
 /*
-*Last names: C
+*Last names: Chua
 *Language: Go
 *Paradigm(s): Procedural
 */
