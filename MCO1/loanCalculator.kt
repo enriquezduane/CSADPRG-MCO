@@ -16,7 +16,7 @@ class LoanCalculator(
 
     fun calculateMonthlyRepayment(): Double {
         val totalInterest = calculateTotalInterest()
-        return (loanAmount + totalInterest) / loanTerm
+        return (loanAmount + totalInterest) / mLoanTerm
     }
     fun getLoanAmount(): Double {
         return loanAmount
@@ -27,7 +27,7 @@ class LoanCalculator(
     }
 
     fun getAnnualInterestRate(): Double {
-        return annualIR
+        return annualIR * 100
     }
 
     fun setAnnualInterestRate(rate: Double) {
@@ -38,13 +38,13 @@ class LoanCalculator(
  
     fun main() {
         print("Enter loan amount (PHP): ")
-        val loanAmount = readln().toDouble()
+        val loanAmount = 100000.0//readln().toDouble()
     
         print("Enter annual interest rate (%): ")
-        val annualIR = readln().toDouble()
+        val annualIR = 0.05//readln().toDouble()
     
         print("Enter loan term (years): ")
-        val loanTerm = readln().toInt()
+        val loanTerm = 2//readln().toInt()
     
         val calculator = LoanCalculator(loanAmount, annualIR, loanTerm)
    
