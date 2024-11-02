@@ -38,13 +38,16 @@ class LoanCalculator(
  
     fun main() {
         print("Enter loan amount (PHP): ")
-        val loanAmount = readln().toDouble()
+        val loanAmount = readLine()?.toDoubleOrNull() ?: 0.0
+        //val loanAmount = readln().toDouble
     
         print("Enter annual interest rate (%): ")
-        val annualIR = readln().toDouble()
+        val annualIR = readLine()?.toDoubleOrNull() ?: 0.0
+        //val annualIR = readln().toDouble
     
         print("Enter loan term (years): ")
-        val loanTerm = readln().toInt()
+        val loanTerm = readLine()?.toIntOrNull() ?: 1
+        //val loanTerm = readln().toInt()
     
         val calculator = LoanCalculator(loanAmount, annualIR, loanTerm)
    
