@@ -111,6 +111,8 @@ class TweetAnalyzer
     puts "Vocabulary Size: #{vocabulary_size}"
     puts "\nTop 20 Most Frequent Words:"
     top_20_words.each { |word, count| puts "#{word}: #{count}" }
+    puts "\nMost Common Symbols:"
+    symbols_distribution.first(20).each { |symbol, count| puts "#{symbol.inspect}: #{count}" }
     puts "\nCommon Stop Words Identified:"
     puts common_stop_words.join(', ')
     
