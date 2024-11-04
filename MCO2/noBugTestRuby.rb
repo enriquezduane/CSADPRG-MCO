@@ -1,3 +1,10 @@
+#********************
+#Last names: Chua
+#Language: Ruby
+#Paradigm(s): Procedural Programming
+#********************
+
+
 require 'csv'
 require 'date'
 require 'gruff'  # For visualization
