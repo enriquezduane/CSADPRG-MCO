@@ -13,23 +13,18 @@ read_tweets <- function() {
     return(tweets)
 }
 
-# data cleaning/wrangling
 clean_text <- function(text) {
+    # set to lowercase
     text <- tolower(text)
-    # remove url
-    text <- str_replace_all(text, "http\\S+\\s*", "")
-    # remove mentions
-    text <- str_replace_all(text, "@user\\d+", "")
-    # remove hashtags
-    text <- str_replace_all(text, "#\\w+", "")
-    # remove emojis
-    text <- str_replace_all(text, "[\U0001F300-\U0001F9FF]", "")
-    # remove punctuation
-    text <- str_replace_all(text, "[[:punct:]]", " ")
-    # remove numbers
-    text <- str_replace_all(text, "[[:digit:]]", " ")
     # remove extra whitespace
     text <- str_squish(text)
+    # Remove multiple consecutive dots (ellipsis)
+    text <- gsub("\\.{2,}", " ", text)
+    # Handle single dots
+    text <- gsub("\\.", " ", text)
+    # Handle emojis
+    text <- iconv(text, "UTF-8", "ASCII", sub="")
+
     return(text)
 }
 
@@ -41,7 +36,7 @@ analyze_corpus <- function(tweets) {
     # create a corpus
     corpus <- Corpus(VectorSource(clean_tweets))
     
-    # get word frequencies
+    # get word frequencies (from cleaned tweets)
     tdm <- TermDocumentMatrix(corpus)
     word_freq <- rowSums(as.matrix(tdm))
     sorted_word_freq <- sort(word_freq, decreasing = TRUE)
@@ -66,6 +61,7 @@ analyze_corpus <- function(tweets) {
     
     return(list(
         total_words = total_words,
+        sorted_word_freq = sorted_word_freq,
         vocab_size = vocab_size,
         top_20_words = top_20_words,
         stop_words = stop_words_freq,
@@ -125,6 +121,10 @@ main <- function() {
     # print results
     cat("Total Words:", analysis$total_words, "\n")
     cat("Vocabulary Size:", analysis$vocab_size, "\n")
+    cat("\nWord Frequencies:\n")
+    print(analysis$sorted_word_freq)
+    cat("\nCharacter Frequencies:\n")
+    print(analysis$char_freq)
     cat("\nTop 20 Most Frequent Words:\n")
     print(analysis$top_20_words)
     cat("\nTop 10 Stop Words:\n")
