@@ -1,7 +1,0 @@
-services:
-  r-analysis:
-    build: .
-    volumes:
-      - ./src:/app/src
-    ports:
-      - "8787:8787"

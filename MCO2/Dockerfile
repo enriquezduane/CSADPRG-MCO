@@ -18,7 +18,7 @@ WORKDIR /app
 
 # Copy requirements file
 COPY requirements.R /app/
-COPY src/ /app/src/
+COPY r/ /app/r/
 
 # Install R packages
 RUN Rscript requirements.R
