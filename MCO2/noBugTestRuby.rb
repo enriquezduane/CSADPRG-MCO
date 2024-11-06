@@ -24,33 +24,24 @@ class TweetAnalyzer
   def word_count
     return @total_word_count if @total_word_count
     @total_word_count = @tweets.sum do |tweet| 
-      clean_text(tweet['text']).split.size 
+      tweet['text'].split.size 
     end
   end
 
   def vocabulary_size
     @tweets.flat_map do |tweet| 
-      clean_text(tweet['text']).split  
+      tweet['text'].split  
     end.uniq.size
   end
 
   def clean_text(text)
-    text = text.downcase
-    text = text.gsub(/http\S+\s*/, '')
-    text = text.gsub(/@user\d+/, '')
-    text = text.gsub(/#\w+/, '')
-    text = text.gsub(/[\u{1F300}-\u{1F9FF}]/, '')
-    text = text.gsub(/[[:punct:]]/, ' ')
-    text = text.gsub(/[[:digit:]]/, ' ')
-    text = text.squeeze(' ').strip
-
-    text
+    text.downcase.squeeze(' ').strip
   end
 
   def calculate_word_frequencies
     @word_frequencies = Hash.new(0)
     @tweets.each do |tweet|
-      words = clean_text(tweet['text']).split
+      words = tweet['text'].split
       words.each { |word| @word_frequencies[word] += 1 }
     end
     @word_frequencies.sort_by { |_, count| -count }.to_h
