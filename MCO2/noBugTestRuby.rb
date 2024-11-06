@@ -14,7 +14,7 @@ class TweetAnalyzer
     @tweets = load_data(file_path)
     @word_frequencies = {}
     @char_frequencies = {}
-    @stop_words = Set.new(["what", "the", "and", "a", "an", "or", "will", "but", "how", "to", "of", "in", "for", "on", "is", "with"])
+    @stop_words = Set.new(["although", "happen", "new", "none", "form", "something", "where", "try", "out", "medical"])
   end
 
   def load_data(file_path)
@@ -22,17 +22,26 @@ class TweetAnalyzer
   end
 
   def word_count
-    @tweets.sum { |tweet| tweet['text'].split.size }
+    return @total_word_count if @total_word_count
+    @total_word_count = @tweets.sum do |tweet| 
+      tweet['text'].split.size 
+    end
   end
 
   def vocabulary_size
-    @tweets.flat_map { |tweet| tweet['text'].downcase.split }.uniq.size
+    @tweets.flat_map do |tweet| 
+      tweet['text'].split  
+    end.uniq.size
+  end
+
+  def clean_text(text)
+    text.downcase.squeeze(' ').strip
   end
 
   def calculate_word_frequencies
     @word_frequencies = Hash.new(0)
     @tweets.each do |tweet|
-      words = tweet['text'].downcase.split
+      words = tweet['text'].split
       words.each { |word| @word_frequencies[word] += 1 }
     end
     @word_frequencies.sort_by { |_, count| -count }.to_h
@@ -54,7 +63,7 @@ class TweetAnalyzer
     calculate_word_frequencies
       .select { |word, _| @stop_words.include?(word) }
       .first(10)
-      .map { |word, _| word }
+      .map { |word, count| { word: word, count: count } }
   end
 
   def posts_by_month
@@ -121,7 +130,7 @@ class TweetAnalyzer
     puts "\nMost Common Symbols:"
     symbols_distribution.first(20).each { |symbol, count| puts "#{symbol.inspect}: #{count}" }
     puts "\nCommon Stop Words Identified:"
-    puts common_stop_words.join(', ')
+    common_stop_words.each { |item| puts "#{item[:word]}: #{item[:count]}" }
     
     # Generate visualizations
     generate_word_cloud
