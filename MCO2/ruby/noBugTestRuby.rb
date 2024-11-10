@@ -4,7 +4,6 @@
 #Paradigm(s): Procedural Programming
 #********************
 
-
 require 'csv'
 require 'date'
 require 'gruff'  # For visualization
@@ -23,14 +22,14 @@ class TweetAnalyzer
 
   def word_count
     return @total_word_count if @total_word_count
-    @total_word_count = @tweets.sum do |tweet| 
-      tweet['text'].split.size 
+    @total_word_count = @tweets.sum do |tweet|
+      clean_and_split_text(tweet['text']).size
     end
   end
 
   def vocabulary_size
-    @tweets.flat_map do |tweet| 
-      tweet['text'].split  
+    @tweets.flat_map do |tweet|
+      clean_and_split_text(tweet['text'])
     end.uniq.size
   end
 
@@ -38,10 +37,19 @@ class TweetAnalyzer
     text.downcase.squeeze(' ').strip
   end
 
+  def clean_and_split_text(text)
+    text.split.map do |word|
+      # Remove hashtag symbol if present
+      word = word.start_with?('#') ? word[1..-1] : word
+      # Additional cleaning
+      word.downcase.gsub(/[^a-z0-9\s]/, '')
+    end.reject(&:empty?)
+  end
+
   def calculate_word_frequencies
     @word_frequencies = Hash.new(0)
     @tweets.each do |tweet|
-      words = tweet['text'].split
+      words = clean_and_split_text(tweet['text'])
       words.each { |word| @word_frequencies[word] += 1 }
     end
     @word_frequencies.sort_by { |_, count| -count }.to_h
@@ -50,6 +58,7 @@ class TweetAnalyzer
   def calculate_char_frequencies
     @char_frequencies = Hash.new(0)
     @tweets.each do |tweet|
+      # Use original text for symbol analysis
       tweet['text'].each_char { |char| @char_frequencies[char] += 1 }
     end
     @char_frequencies.sort_by { |_, count| -count }.to_h
@@ -78,7 +87,7 @@ class TweetAnalyzer
 
   def symbols_distribution
     @char_frequencies = calculate_char_frequencies if @char_frequencies.empty?
-    symbols = @char_frequencies.select do |char, _| 
+    symbols = @char_frequencies.select do |char, _|
       char.match?(/[[:space:]]/) || # spaces and whitespace
       char.match?(/[[:punct:]]/) || # punctuation
       char.match?(/[^\x00-\x7F]/) || # emojis and other non-ASCII characters
