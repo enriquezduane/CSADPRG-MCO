@@ -7,13 +7,15 @@
 require 'csv'
 require 'date'
 require 'gruff'  # For visualization
+require 'magic_cloud' # for word cloud
 
 class TweetAnalyzer
   def initialize(file_path)
     @tweets = load_data(file_path)
     @word_frequencies = {}
-    @char_frequencies = {}
+    @char_frequencies = Hash.new(0)  
     @stop_words = Set.new(["although", "happen", "new", "none", "form", "something", "where", "try", "out", "medical"])
+    calculate_char_frequencies  
   end
 
   def load_data(file_path)
@@ -38,6 +40,7 @@ class TweetAnalyzer
   end
 
   def clean_and_split_text(text)
+    return [] unless text  # Handle nil text
     text.split.map do |word|
       # Remove hashtag symbol if present
       word = word.start_with?('#') ? word[1..-1] : word
@@ -56,12 +59,16 @@ class TweetAnalyzer
   end
 
   def calculate_char_frequencies
-    @char_frequencies = Hash.new(0)
+    @char_frequencies.clear  
     @tweets.each do |tweet|
-      # Use original text for symbol analysis
-      tweet['text'].each_char { |char| @char_frequencies[char] += 1 }
+      next unless tweet['text']  
+      tweet['text'].each_char do |char|
+        @char_frequencies[char] += 1
+      end
     end
-    @char_frequencies.sort_by { |_, count| -count }.to_h
+    
+    # Sort by frequency in descending order
+    @char_frequencies = @char_frequencies.sort_by { |_, count| -count }.to_h
   end
 
   def top_20_words
@@ -86,25 +93,14 @@ class TweetAnalyzer
   end
 
   def symbols_distribution
-    @char_frequencies = calculate_char_frequencies if @char_frequencies.empty?
     symbols = @char_frequencies.select do |char, _|
-      char.match?(/[[:space:]]/) || # spaces and whitespace
-      char.match?(/[[:punct:]]/) || # punctuation
-      char.match?(/[^\x00-\x7F]/) || # emojis and other non-ASCII characters
-      (!char.match?(/[[:alnum:]]/)) # anything that's not alphanumeric
+      char.match?(/[[:space:]]/) ||
+      char.match?(/[[:punct:]]/) || 
+      char.match?(/[^\x00-\x7F]/) || 
+      char.match?(/[^[:alnum:]]/)    
     end
+ 
     symbols.sort_by { |_, count| -count }.to_h
-  end
-
-  def generate_word_cloud
-    g = Gruff::Pie.new(800)
-    g.title = 'Top 20 Words Word Cloud'
-    
-    top_20_words.each do |word, count|
-      g.data(word, count)
-    end
-    
-    g.write('word_cloud.png')
   end
 
   def generate_monthly_posts_chart
@@ -122,11 +118,39 @@ class TweetAnalyzer
     g = Gruff::Pie.new(800)
     g.title = 'Symbol Distribution'
     
-    symbols_distribution.each do |symbol, count|
-      g.data(symbol, count)
+    # Take top 10 symbols for better readability
+    symbols_distribution.first(10).each do |symbol, count|
+      label = symbol.match?(/[[:space:]]/) ? "SPACE" : symbol.inspect
+      g.data(label, count)
     end
     
     g.write('symbols_distribution.png')
+  end
+
+  def generate_word_cloud
+    # Convert word frequencies to the expected format [word, count]
+    word_data = top_20_words.map { |word, count| [word, count] }
+    
+    cloud = MagicCloud::Cloud.new(
+      word_data,
+      rotate: :free,
+      scale: :log  
+    )
+    
+    img = cloud.draw(800, 600) 
+    img.write('word_cloud.png')
+  end
+
+  def print_char_frequencies
+    puts "\nCharacter Frequency Distribution:"
+    puts "--------------------------------"
+    @char_frequencies.first(20).each do |char, count|
+      if char.match?(/[[:space:]]/)
+        puts "SPACE: #{count}"
+      else
+        puts "#{char.inspect}: #{count}"
+      end
+    end
   end
 
   def analyze_corpus
@@ -136,8 +160,16 @@ class TweetAnalyzer
     puts "Vocabulary Size: #{vocabulary_size}"
     puts "\nTop 20 Most Frequent Words:"
     top_20_words.each { |word, count| puts "#{word}: #{count}" }
+    print_char_frequencies
     puts "\nMost Common Symbols:"
-    symbols_distribution.first(20).each { |symbol, count| puts "#{symbol.inspect}: #{count}" }
+    symbols_distribution.first(20).each { |symbol, count| 
+      if symbol.match?(/[[:space:]]/)
+        puts "SPACE: #{count}"
+      else
+        puts "#{symbol.inspect}: #{count}"
+      end
+    }
+    
     puts "\nCommon Stop Words Identified:"
     common_stop_words.each { |item| puts "#{item[:word]}: #{item[:count]}" }
     
