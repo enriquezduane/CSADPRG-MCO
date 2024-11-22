@@ -1,7 +1,7 @@
 #********************
 #Last names: Chua
 #Language: Ruby
-#Paradigm(s): Procedural Programming
+#Paradigm(s): Object-Oriented Programming
 #********************
 
 require 'csv'
@@ -108,8 +108,22 @@ class TweetAnalyzer
     g.title = 'Posts per Month'
     
     monthly_data = posts_by_month
-    g.labels = monthly_data.keys.each_with_index.to_h
+
+    labels = {}
+    monthly_data.keys.each_with_index do |date_key, index|
+      year, month = date_key.split('-')
+      month_name = Date.new(year.to_i, month.to_i, 1).strftime("%b")
+      labels[index] = "#{month_name}\n#{year}"
+    end
+    
+    g.labels = labels
     g.data('Posts', monthly_data.values)
+    
+    g.minimum_value = 0
+    g.y_axis_increment = 1  
+    g.show_labels_for_bar_values = true
+    g.marker_font_size = 12
+    g.label_rotation = 45  
     
     g.write('monthly_posts.png')
   end
